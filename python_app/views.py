@@ -1,54 +1,97 @@
-import datetime
 from django.shortcuts import render
 from django.http import HttpResponse,Http404
-import datetime
-from django.shortcuts import render,get_object_or_404
-from . models import conn
+from .models import conn
 from rest_framework.views import APIView
-from . serializers import serial
+from .serializers import serial
 from rest_framework.response import Response
-from rest_framework import status
+import datetime
 
+#this will call the date
+def now(request):
+    return HttpResponse(f'Hai Today date is {datetime.datetime.now()}')
 
 # Create your views here.
-def now(request):
-    date = datetime.datetime.now()
-    msg = f"Hey today date is {date}"
-    return HttpResponse(msg)
 def hello(request):
-    return render(request, 'hello.html',{'name':'Bala Krishan baddi'})
+    return HttpResponse("Hello World")
 
+#creating the APT View for the CRUD Operations...
 class connection(APIView):
-   def get_object(self, pk):
-            try:
-                return conn.objects.get(pk=pk)
-            except conn.DoesNotExist:
-                raise Http404
-   def get(self, request, pk=None, format=None):
+    def get_object(self, pk):
+        try:
+            return conn.objects.get(pk=pk)
+        except conn.DoesNotExist:
+            raise Http404
 
+    #get operation
+    def get(self, request, pk=None, format=None):
         if pk:
-                data = self.get_object(pk)
-                var_serializer = serial(data)
-                return Response([var_serializer.data])
+            data = self.get_object(pk)
+            var_serializer = serial(data)
+            return Response([var_serializer.data])
+
 
         else:
-                data = conn.objects.all()
-                var_serializer = serial(data, many=True)
+            data = conn.objects.all()
+            var_serializer = serial(data, many=True)
+            return Response(var_serializer.data)
 
-                return Response(var_serializer.data)
+    #post operatoin...
+    # def post(self,request,format=None):
+    #     data = request.data
+    #     var_ser =serial(data=data)
+    #     var_ser.is_valid(raise_exception=True)
+    #
+    #     #saving the data
+    #     var_ser.save()
+    #     response = Response()
+    #     #giving response
+    #     response.data = {
+    #         'message':"connection created sucessfully",
+    #         'date':var_ser.data
+    #     }
+    #     return  response
 
-   def post(self, request, format=None):
-       data = request.data
-       var_serializer = serial(data=data)
+    #delete operation...
 
-       var_serializer.is_valid(raise_exception=True)
+    # post operation updated
+    def post(self, request, format=None):
+        data = request.data
+        var_ser = serial(data=data)
+        var_ser.is_valid(raise_exception=True)
 
-       var_serializer.save()
+        # saving the data
+        var_ser.save()
+        response = Response()
+        # giving response
+        response.data = {
+            'message': "connection created successfully",
+            'date': var_ser.data
+        }
+        return response
 
-       response = Response()
+    #delete operation
+    def delete(self,request,pk,format=None):
+        to_delete_list = conn.objects.get(pk=pk)
+        to_delete_list.delete()
 
-       response.data = {
-           'message': 'connect Created Successfully',
-           'data': var_serializer.data
-       }
-       return response
+        return Response({
+            'message':"deleted sucessfully"
+        })
+
+    # put operation...
+    def put(self, request, pk, format=None):
+        conn_obj = self.get_object(pk)
+        data = request.data
+        var_ser = serial(conn_obj, data=data)
+        var_ser.is_valid(raise_exception=True)
+        var_ser.save()
+
+        response = Response()
+        response.data = {
+            'message': "connection updated successfully",
+            'data': var_ser.data
+        }
+        return response
+
+
+
