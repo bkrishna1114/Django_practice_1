@@ -35,22 +35,6 @@ class connection(APIView):
             var_serializer = serial(data, many=True)
             return Response(var_serializer.data)
 
-    #post operatoin...
-    # def post(self,request,format=None):
-    #     data = request.data
-    #     var_ser =serial(data=data)
-    #     var_ser.is_valid(raise_exception=True)
-    #
-    #     #saving the data
-    #     var_ser.save()
-    #     response = Response()
-    #     #giving response
-    #     response.data = {
-    #         'message':"connection created sucessfully",
-    #         'date':var_ser.data
-    #     }
-    #     return  response
-
     #delete operation...
 
     # post operation updated
@@ -93,5 +77,11 @@ class connection(APIView):
         }
         return response
 
-
-
+    #addition starts here........
+def add(self,a,b):
+    return HttpResponse(
+        f"Addition of {a,b} is {a+b}<br><br>\
+        substraction of {a, b} is {a - b}<br><br>\
+        multiplication of {a, b} is {a * b}<br><br>\
+        division of {a, b} is {a / b}"
+        )
