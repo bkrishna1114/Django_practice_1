@@ -41,7 +41,7 @@ class connection(APIView):
     def post(self, request, format=None):
         data = request.data
         var_ser = serial(data=data)
-        var_ser.is_valid(raise_exception=True)
+        var_ser.is_valid(raise_exception=True) #this will through an error if input data is in not proper format
 
         # saving the data
         var_ser.save()
@@ -55,11 +55,14 @@ class connection(APIView):
 
     #delete operation
     def delete(self,request,pk,format=None):
-        to_delete_list = conn.objects.get(pk=pk)
+        data = self.get_object(pk)
+        var_serializer = serial(data)
+        to_delete_list = conn.objects.get(pk=pk) #its act like cursor
         to_delete_list.delete()
 
         return Response({
-            'message':"deleted sucessfully"
+            'message':"deleted sucessfully",
+            'data is ': var_serializer.data
         })
 
     # put operation...
